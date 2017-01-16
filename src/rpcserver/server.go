@@ -20,6 +20,7 @@ func startServer() {
 	go http.Serve(l, nil)
 }
 
+//Start the server, listen forever. 
 func main() {
 	startServer()
 	meta := make(chan int)

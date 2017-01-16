@@ -22,11 +22,12 @@ func (t *BulkExtractor) Extract(args *Args, reply *string) error {
     pathToTool := "/usr/local/bin/bulk_extractor"
     fmt.Println("Path to BulkExtractor: " , pathToTool)
 
-	bulk_Input_Directory  := "/tmp/bulk_in/"
-	bulk_Output_Directory := "/tmp/bulk_out/"    //make sure this does not exist beforehand per BE docs
+	bulk_Input_Directory  := "/tmp/bulk_in/"  + args.DataID + "/"
+	bulk_Output_Directory := "/tmp/bulk_out/" + args.DataID + "/"
 
 	// Bulk Extractor works by inspecting data in a directory (or a raw disk dump), setup the passed in data as such:
-	filepath := bulk_Input_Directory + args.DataID
+	os.MkdirAll(bulk_Input_Directory, 0644)
+	filepath := bulk_Input_Directory + "data.dat"
 	fmt.Println("Path to write given data to: ", filepath)
 	err := ioutil.WriteFile(filepath, args.Data, 0644)
 	if err != nil {
@@ -43,9 +44,9 @@ func (t *BulkExtractor) Extract(args *Args, reply *string) error {
     var out bytes.Buffer
     cmd.Stdout = &out
 
+	// Actually run the command: 
     err = cmd.Run()
 	fmt.Println("[-] Output: ", out.String())
-
 
 	//Post process the BE output
 	jsonMapping := make(map[string]string)
@@ -71,13 +72,18 @@ func (t *BulkExtractor) Extract(args *Args, reply *string) error {
 	}
 	fmt.Println(string(jsonString))
 
+	//We want to return the JSON in addition to STDOUT
 	*reply = out.String()
     if err != nil {
             log.Println(err)
     }
 
-	// If all goes well, remove temp directory
-	os.Remove(bulk_Output_Directory)
+	// If all goes well, remove temp directories
+	remerr := os.RemoveAll(bulk_Input_Directory)
+	remerr  = os.RemoveAll(bulk_Output_Directory)
+	if remerr != nil {
+		fmt.Println("Error cleaning up temporary directories: ", remerr)
+	}
     return nil
 }
 
