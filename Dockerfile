@@ -10,6 +10,7 @@ RUN cd bulk_extractor-1.5.5/ && ./configure && make && sudo make install
 
 ADD bin/rpcserver /
 ADD bin/rpcclient /
+ADD banner.txt    /
 
 RUN mkdir -p /tmp/bulk_in/
 
