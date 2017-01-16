@@ -4,6 +4,7 @@ import (
 	"strings"
     "fmt"
     "os/exec"
+	"os"
     "log"
     "bytes"
 	"io/ioutil"
@@ -63,10 +64,7 @@ func (t *BulkExtractor) Extract(args *Args, reply *string) error {
 		}
     }
 
-	//for key, value := range jsonMapping {
-	//	fmt.Println("Key:", key, "Value:", value)
-	//}
-
+	// Dump everything into JSON in preperation for Elasticsearch upload
 	jsonString, err := json.Marshal(jsonMapping)
     if err != nil {
             log.Println(err)
@@ -77,6 +75,9 @@ func (t *BulkExtractor) Extract(args *Args, reply *string) error {
     if err != nil {
             log.Println(err)
     }
-    return err
+
+	// If all goes well, remove temp directory
+	os.Remove(bulk_Output_Directory)
+    return nil
 }
 
