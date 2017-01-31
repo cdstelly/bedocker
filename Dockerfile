@@ -13,5 +13,8 @@ ADD bin/rpcclient /
 ADD banner.txt    /
 
 RUN mkdir -p /tmp/bulk_in/
+RUN mkdir -p /tmp/bulk_out/
+RUN mkdir -p /temp/bulk_in/
+RUN mkdir -p /temp/bulk_out/
 
 CMD ["/rpcserver"]
